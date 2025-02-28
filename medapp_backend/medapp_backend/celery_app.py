@@ -1,4 +1,4 @@
-# medapp_backend/celery.py
+# medapp_backend/celery_app.py
 import os
 from celery import Celery
 
@@ -7,8 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'medapp_backend.settings')
 
 app = Celery('medapp_backend')
 
-# Using a string here means the worker doesn't have to serialize
-# the configuration object to child processes.
+# Use a string here so that the worker doesn't have to serialize the configuration object.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django apps.
