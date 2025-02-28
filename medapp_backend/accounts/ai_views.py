@@ -1,3 +1,4 @@
+# accounts/ai_views.py
 import requests
 from rest_framework.views import APIView
 from rest_framework import permissions, status
@@ -8,7 +9,8 @@ class ChatbotQueryView(APIView):
 
     def post(self, request, *args, **kwargs):
         query = request.data.get("query")
-        flask_url = "http://localhost:5000/ai-query/"  # Replace with your actual Flask AI endpoint URL
+        # Replace with your actual Flask AI endpoint URL
+        flask_url = "http://your-flask-service-url/ai-query/"
         try:
             response = requests.post(flask_url, json={"query": query})
             data = response.json()

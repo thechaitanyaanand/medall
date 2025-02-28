@@ -16,3 +16,13 @@ urlpatterns = [
 urlpatterns += [
     path('chatbot/', ChatbotQueryView.as_view(), name='chatbot'),
 ]
+
+# accounts/urls.py (append to existing urlpatterns)
+from .views import AddFamilyMemberView, FamilyListView, DoctorConnectionListView, PatientConnectionListView
+
+urlpatterns += [
+    path('family/add/', AddFamilyMemberView.as_view(), name='family_add'),
+    path('family/', FamilyListView.as_view(), name='family_list'),
+    path('connections/doctor/', DoctorConnectionListView.as_view(), name='doctor_connections'),
+    path('connections/patient/', PatientConnectionListView.as_view(), name='patient_connections'),
+]

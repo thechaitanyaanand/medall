@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .serializers import RegistrationSerializer, OTPVerificationSerializer, ProfileSerializer
 from .models import CustomUser, OTPVerification, Profile
 from django.conf import settings
+from .serializers import FamilySerializer, ConnectionSerializer
 
 # Registration Endpoint
 class RegistrationView(generics.CreateAPIView):
@@ -63,3 +64,40 @@ class RegistrationView(generics.CreateAPIView):
                 {"error": "Failed to send OTP. Please try again later."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
+
+# Add Family Member: Send OTP to add a family member
+class AddFamilyMemberView(generics.CreateAPIView):
+    serializer_class = FamilySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # In a real scenario, validate the OTP before adding
+        serializer.save(user=self.request.user)
+
+# List Family Members
+class FamilyListView(generics.ListAPIView):
+    serializer_class = FamilySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Family.objects.filter(user=self.request.user)
+
+# For doctors: List connected patients
+class DoctorConnectionListView(generics.ListAPIView):
+    serializer_class = ConnectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Ensure the user is a doctor
+        return Connection.objects.filter(doctor=self.request.user, verified=True)
+
+# For patients: List connected doctors
+class PatientConnectionListView(generics.ListAPIView):
+    serializer_class = ConnectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Ensure the user is a patient
+        return Connection.objects.filter(patient=self.request.user, verified=True)

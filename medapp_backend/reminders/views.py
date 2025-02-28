@@ -1,24 +1,45 @@
-from django.shortcuts import render
-
-# Create your views here.
-
+# reminders/views.py
 from rest_framework import generics, permissions
-from .models import Reminder
-from .serializers import ReminderSerializer
+from .models import Reminder, Appointment
+from .serializers import ReminderSerializer, AppointmentSerializer
+from django.db import transaction
 
-# List and Create Reminders
+# List existing reminders and create a new reminder
 class ReminderListCreateView(generics.ListCreateAPIView):
     serializer_class = ReminderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Only show reminders for the authenticated user
         return Reminder.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
+        # Associate the new reminder with the authenticated user
         serializer.save(user=self.request.user)
 
-# Retrieve, Update, and Delete a Reminder
+# Retrieve, update, and delete a specific reminder
 class ReminderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReminderSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Reminder.objects.all()
+    
+    @transaction.atomic
+    def patch(self, request, *args, **kwargs):
+        # This will wrap the partial update in a transaction
+        return super().patch(request, *args, **kwargs)
+# Appointments: list and create
+class AppointmentListCreateView(generics.ListCreateAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Appointment.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+# Appointments: retrieve, update, delete
+class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Appointment.objects.all()

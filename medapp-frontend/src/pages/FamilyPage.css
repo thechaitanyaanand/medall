@@ -1,0 +1,59 @@
+.container {
+    background-color: #f0f4f8;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  h2, h3 {
+    color: #007bff;
+    text-align: center;
+  }
+  
+  .family-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .family-card {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .family-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .family-form, .otp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .family-form input, .otp-form input,
+  .family-form button, .otp-form button {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 16px;
+  }
+  
+  .family-form button, .otp-form button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .family-form button:hover, .otp-form button:hover {
+    background-color: #0056b3;
+  }
+  
