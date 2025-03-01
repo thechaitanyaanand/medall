@@ -18,8 +18,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         user = CustomUser.objects.create_user(**validated_data)
-        # Generate OTP – in production, use a secure random generator
-        OTPVerification.objects.create(user=user, otp_code='123456')
+        # Here you would normally trigger OTP generation, etc.
         return user
 
 class OTPVerificationSerializer(serializers.ModelSerializer):
@@ -44,3 +43,8 @@ class ConnectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Connection
         fields = '__all__'
+
+class PushTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['expo_push_token']  # or your field name for the push token

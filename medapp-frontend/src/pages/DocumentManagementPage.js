@@ -1,34 +1,76 @@
-import React, { useState } from 'react';
+// src/pages/DocumentManagementPage.js
+import React, { useState, useEffect } from 'react';
+import apiClient from '../apiClient';
 import './DocumentManagementPage.css';
 
 export default function DocumentManagementPage() {
-  const initialDocuments = [
-    {
-      id: 1,
-      name: 'Blood Test Report',
-      type: 'Report',
-      date: '2023-01-15',
-      fileUrl: 'https://example.com/report1.pdf',
-    },
-  ];
-
-  const [documents, setDocuments] = useState(initialDocuments);
-  const [formData, setFormData] = useState({
-    name: '',
-    type: '',
-    date: '',
-    fileUrl: '',
+  const [documents, setDocuments] = useState([]);
+  const [newDoc, setNewDoc] = useState({
+    document_name: '',
+    document_type: '',
+    document_date: '',
   });
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  // Fetch documents on component mount
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await apiClient.get('/documents/');
+        setDocuments(response.data);
+      } catch (error) {
+        console.error("Error fetching documents:", error.response?.data || error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocuments();
+  }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewDoc((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newDoc = { id: Date.now(), ...formData };
-    setDocuments([newDoc, ...documents]);
-    setFormData({ name: '', type: '', date: '', fileUrl: '' });
+    setErrorMsg('');
+    const formData = new FormData();
+    formData.append('document_name', newDoc.document_name);
+    formData.append('document_type', newDoc.document_type);
+    formData.append('document_date', newDoc.document_date);
+    formData.append('file', file);
+
+    try {
+      const response = await apiClient.post('/documents/add/', formData);
+      setDocuments((prev) => [response.data, ...prev]);
+      setNewDoc({ document_name: '', document_type: '', document_date: '' });
+      setFile(null);
+    } catch (error) {
+      console.error("Error uploading document:", error.response?.data || error.message);
+      setErrorMsg(JSON.stringify(error.response?.data));
+      alert("Error uploading document.");
+    }
+  };
+
+  // Handler for "Delete": sends a DELETE request for the document
+  const handleDelete = async (documentId) => {
+    if (!window.confirm("Are you sure you want to delete this document?")) {
+      return;
+    }
+    try {
+      await apiClient.delete(`/documents/${documentId}/`);
+      setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
+    } catch (error) {
+      console.error("Error deleting document:", error.response?.data || error.message);
+      alert("Error deleting document.");
+    }
   };
 
   return (
@@ -37,49 +79,54 @@ export default function DocumentManagementPage() {
       <form onSubmit={handleSubmit} className="document-form">
         <input
           type="text"
-          name="name"
+          name="document_name"
           placeholder="Document Name"
-          value={formData.name}
+          value={newDoc.document_name}
           onChange={handleChange}
           required
         />
         <input
           type="text"
-          name="type"
+          name="document_type"
           placeholder="Document Type"
-          value={formData.type}
+          value={newDoc.document_type}
           onChange={handleChange}
           required
         />
         <input
           type="date"
-          name="date"
-          value={formData.date}
+          name="document_date"
+          placeholder="Document Date"
+          value={newDoc.document_date}
           onChange={handleChange}
           required
         />
         <input
-          type="url"
-          name="fileUrl"
-          placeholder="Document URL"
-          value={formData.fileUrl}
-          onChange={handleChange}
+          type="file"
+          name="file"
+          onChange={handleFileChange}
           required
         />
         <button type="submit">Add Document</button>
       </form>
-      <div className="document-list">
-        {documents.map((doc) => (
-          <div key={doc.id} className="document-card">
-            <h3>{doc.name}</h3>
-            <p>Type: {doc.type}</p>
-            <p>Date: {doc.date}</p>
-            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
-              View Document
-            </a>
-          </div>
-        ))}
-      </div>
+      {errorMsg && <p className="error">Error: {errorMsg}</p>}
+      {loading ? (
+        <p>Loading documents...</p>
+      ) : (
+        <div className="document-list">
+          {documents.map((doc) => (
+            <div key={doc.id} className="document-card">
+              <h3>{doc.document_name}</h3>
+              <p>Type: {doc.document_type}</p>
+              <p>Date: {doc.document_date}</p>
+              <a href={doc.file} target="_blank" rel="noopener noreferrer">
+                View Document
+              </a>
+              <button onClick={() => handleDelete(doc.id)}>Delete Document</button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

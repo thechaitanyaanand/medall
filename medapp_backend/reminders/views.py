@@ -4,20 +4,16 @@ from .models import Reminder, Appointment
 from .serializers import ReminderSerializer, AppointmentSerializer
 from django.db import transaction
 
-# List existing reminders and create a new reminder
 class ReminderListCreateView(generics.ListCreateAPIView):
     serializer_class = ReminderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Only show reminders for the authenticated user
         return Reminder.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
-        # Associate the new reminder with the authenticated user
         serializer.save(user=self.request.user)
 
-# Retrieve, update, and delete a specific reminder
 class ReminderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReminderSerializer
     permission_classes = [permissions.IsAuthenticated]

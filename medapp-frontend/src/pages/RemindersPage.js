@@ -1,89 +1,133 @@
-import React, { useState } from 'react';
+// src/pages/RemindersPage.js
+import React, { useState, useEffect } from 'react';
+import apiClient from '../apiClient';
 import './RemindersPage.css';
 
 export default function RemindersPage() {
-  // Initial reminders (simulated data)
-  const initialReminders = [
-    { id: 1, medicineName: 'Aspirin', dosage: '100mg', timings: '8:00 AM, 8:00 PM', tabletCount: 10 },
-    { id: 2, medicineName: 'Metformin', dosage: '500mg', timings: '9:00 AM, 9:00 PM', tabletCount: 0 },
-  ];
-
-  // State for the list of reminders
-  const [reminders, setReminders] = useState(initialReminders);
-
-  // State for the new reminder form
+  const [reminders, setReminders] = useState([]);
   const [newReminder, setNewReminder] = useState({
-    medicineName: '',
+    medicine_name: '',
     dosage: '',
     timings: '',
-    tabletCount: '',
+    tabletCount: '',  // As a string from input; convert to integer when sending
   });
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // Handle changes in the new reminder form fields
-  const handleNewReminderChange = (e) => {
-    const { name, value } = e.target;
-    setNewReminder({ ...newReminder, [name]: value });
-  };
-
-  // Add a new reminder to the list
-  const handleAddReminder = (e) => {
-    e.preventDefault();
-    const reminderToAdd = {
-      id: Date.now(),
-      medicineName: newReminder.medicineName,
-      dosage: newReminder.dosage,
-      timings: newReminder.timings,
-      tabletCount: parseInt(newReminder.tabletCount, 10),
-    };
-    setReminders([reminderToAdd, ...reminders]);
-    setNewReminder({ medicineName: '', dosage: '', timings: '', tabletCount: '' });
-  };
-
-  // Handle taking a dose (reduce tablet count by 1 if available)
-  const handleTakeDose = (id) => {
-    setReminders(reminders.map(reminder => {
-      if (reminder.id === id && reminder.tabletCount > 0) {
-        return { ...reminder, tabletCount: reminder.tabletCount - 1 };
+  // Fetch existing reminders on component mount
+  useEffect(() => {
+    const fetchReminders = async () => {
+      try {
+        const response = await apiClient.get('/reminders/reminders/');
+        setReminders(response.data);
+      } catch (error) {
+        console.error("Error fetching reminders:", error.response?.data || error.message);
+      } finally {
+        setLoading(false);
       }
-      return reminder;
-    }));
+    };
+    fetchReminders();
+  }, []);
+
+  // Update newReminder state on input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewReminder((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle refilling a reminder (prompt user for number to add)
-  const handleRefill = (id) => {
-    const amountStr = prompt("Enter number of tablets to add:");
-    if (!amountStr) return;
-    const amount = parseInt(amountStr, 10);
-    if (isNaN(amount) || amount <= 0) {
-      alert("Invalid number");
+  // Create a new reminder
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    const reminderPayload = {
+      ...newReminder,
+      tabletCount: parseInt(newReminder.tabletCount, 10), // Convert tabletCount to integer
+    };
+    try {
+      const response = await apiClient.post('/reminders/reminders/', reminderPayload);
+      // Append the newly created reminder to state
+      setReminders((prev) => [response.data, ...prev]);
+      // Clear the form
+      setNewReminder({
+        medicine_name: '',
+        dosage: '',
+        timings: '',
+        tabletCount: '',
+      });
+    } catch (error) {
+      console.error("Error creating reminder:", error.response?.data || error.message);
+      setErrorMsg(JSON.stringify(error.response?.data));
+      alert("Error creating reminder.");
+    }
+  };
+
+  // Handler for "Take Dose": decrement tabletCount by 1 if possible
+  const handleTakeDose = async (reminderId, currentTabletCount) => {
+    if (currentTabletCount <= 0) {
+      alert("No tablets left! Please refill.");
       return;
     }
-    setReminders(reminders.map(reminder => {
-      if (reminder.id === id) {
-        return { ...reminder, tabletCount: reminder.tabletCount + amount };
-      }
-      return reminder;
-    }));
+    try {
+      const newCount = currentTabletCount - 1;
+      const response = await apiClient.patch(`/reminders/reminders/${reminderId}/`, {
+        tabletCount: newCount,
+      });
+      // Update state for this reminder
+      setReminders((prev) =>
+        prev.map((r) => (r.id === reminderId ? response.data : r))
+      );
+    } catch (error) {
+      console.error("Error taking dose:", error.response?.data || error.message);
+      alert("Error taking dose.");
+    }
   };
 
-  // Handle deletion of a reminder
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this reminder?")) {
-      setReminders(reminders.filter(reminder => reminder.id !== id));
+  // Handler for "Refill": prompt user for refill amount, then update tabletCount
+  const handleRefill = async (reminderId, currentTabletCount) => {
+    const refillAmount = prompt("Enter the number of tablets to add:");
+    const addAmount = parseInt(refillAmount, 10);
+    if (!addAmount || addAmount <= 0) {
+      alert("Invalid refill amount.");
+      return;
+    }
+    try {
+      const newCount = currentTabletCount + addAmount;
+      const response = await apiClient.patch(`/reminders/reminders/${reminderId}/`, {
+        tabletCount: newCount,
+      });
+      setReminders((prev) =>
+        prev.map((r) => (r.id === reminderId ? response.data : r))
+      );
+    } catch (error) {
+      console.error("Error refilling:", error.response?.data || error.message);
+      alert("Error refilling.");
+    }
+  };
+
+  // Handler for "Delete": remove reminder from backend and update state
+  const handleDelete = async (reminderId) => {
+    if (!window.confirm("Are you sure you want to delete this reminder?")) {
+      return;
+    }
+    try {
+      await apiClient.delete(`/reminders/reminders/${reminderId}/`);
+      setReminders((prev) => prev.filter((r) => r.id !== reminderId));
+    } catch (error) {
+      console.error("Error deleting reminder:", error.response?.data || error.message);
+      alert("Error deleting reminder.");
     }
   };
 
   return (
     <div className="container">
       <h2>Medicine Reminders</h2>
-      {/* Form to add a new reminder */}
-      <form onSubmit={handleAddReminder} className="new-reminder-form">
+      <form onSubmit={handleSubmit} className="new-reminder-form">
         <input
           type="text"
-          name="medicineName"
+          name="medicine_name"
           placeholder="Medicine Name"
-          value={newReminder.medicineName}
-          onChange={handleNewReminderChange}
+          value={newReminder.medicine_name}
+          onChange={handleChange}
           required
         />
         <input
@@ -91,15 +135,14 @@ export default function RemindersPage() {
           name="dosage"
           placeholder="Dosage"
           value={newReminder.dosage}
-          onChange={handleNewReminderChange}
+          onChange={handleChange}
           required
         />
         <input
-          type="text"
+          type="time"
           name="timings"
-          placeholder="Timings (e.g., 8:00 AM, 8:00 PM)"
           value={newReminder.timings}
-          onChange={handleNewReminderChange}
+          onChange={handleChange}
           required
         />
         <input
@@ -107,25 +150,27 @@ export default function RemindersPage() {
           name="tabletCount"
           placeholder="Tablet Count"
           value={newReminder.tabletCount}
-          onChange={handleNewReminderChange}
+          onChange={handleChange}
           required
         />
         <button type="submit">Add Reminder</button>
       </form>
-      {/* List of reminders */}
-      <div className="reminder-list">
-        {reminders.map(reminder => (
-          <div key={reminder.id} className="reminder-card">
-            <div className="reminder-header">
-              <h3>{reminder.medicineName}</h3>
+      {errorMsg && <p className="error">Error: {errorMsg}</p>}
+      {loading ? (
+        <p>Loading reminders...</p>
+      ) : (
+        <div className="reminder-list">
+          {reminders.map((reminder) => (
+            <div key={reminder.id} className="reminder-card">
+              <h3>{reminder.medicine_name}</h3>
+              <p>Dosage: {reminder.dosage}</p>
+              <p>Timings: {reminder.timings}</p>
+              <p>Tablets Left: {reminder.tabletCount}</p>
               <div className="reminder-actions">
-                <button 
-                  onClick={() => handleTakeDose(reminder.id)} 
-                  disabled={reminder.tabletCount <= 0}
-                >
+                <button onClick={() => handleTakeDose(reminder.id, reminder.tabletCount)}>
                   Take Dose
                 </button>
-                <button onClick={() => handleRefill(reminder.id)}>
+                <button onClick={() => handleRefill(reminder.id, reminder.tabletCount)}>
                   Refill
                 </button>
                 <button onClick={() => handleDelete(reminder.id)}>
@@ -133,12 +178,9 @@ export default function RemindersPage() {
                 </button>
               </div>
             </div>
-            <p>Dosage: {reminder.dosage}</p>
-            <p>Timings: {reminder.timings}</p>
-            <p>Tablets Left: {reminder.tabletCount}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
-# reminders/urls.py
 from django.urls import path
-from .views import ReminderListCreateView, ReminderDetailView, AppointmentListCreateView, AppointmentDetailView
+from .views import (
+    ReminderListCreateView, ReminderDetailView,
+    AppointmentListCreateView, AppointmentDetailView
+)
 
 urlpatterns = [
     path('reminders/', ReminderListCreateView.as_view(), name='reminder_list_create'),

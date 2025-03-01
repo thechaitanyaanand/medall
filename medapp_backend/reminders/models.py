@@ -1,4 +1,4 @@
-# reminders/models.py
+# medapp_backend/reminders/models.py
 from django.db import models
 from django.conf import settings
 
@@ -7,7 +7,7 @@ class Reminder(models.Model):
     medicine_name = models.CharField(max_length=100)
     dosage = models.CharField(max_length=50, blank=True, null=True)
     timings = models.CharField(max_length=100, blank=True, null=True)
-    tabletCount = models.IntegerField(default=0)  # using camelCase as per your front-end (or snake_case if preferred)
+    tabletCount = models.IntegerField(default=0)  # Ensure this field is an integer
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):

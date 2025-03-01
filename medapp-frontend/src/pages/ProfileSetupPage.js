@@ -1,41 +1,61 @@
-// src/pages/ProfileSetupPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../apiClient';
+import './ProfileSetupPage.css';
 
-function ProfileSetupPage() {
-  const [profile, setProfile] = useState({
+export default function ProfileSetupPage() {
+  const [profileData, setProfileData] = useState({
     fullName: '',
     address: '',
-    dob: '',
+    dateOfBirth: '',
   });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Submit profile data to backend
-    console.log('Profile data:', profile);
-    // On success, navigate to login page (or directly to home if auto-login)
-    navigate('/login');
+    try {
+      const response = await apiClient.post('/accounts/profile-setup/', profileData);
+      console.log('Profile setup complete:', response.data);
+      navigate('/home');
+    } catch (error) {
+      console.error('Profile setup error:', error.response?.data || error.message);
+      alert('Profile setup failed.');
+    }
   };
 
   return (
     <div className="container">
       <h2>Profile Setup</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Full Name:</label>
-        <input type="text" name="fullName" value={profile.fullName} onChange={handleChange} required />
-        <label>Address:</label>
-        <input type="text" name="address" value={profile.address} onChange={handleChange} required />
-        <label>Date of Birth:</label>
-        <input type="date" name="dob" value={profile.dob} onChange={handleChange} required />
+      <form onSubmit={handleSubmit} className="profile-form">
+        <input
+          type="text"
+          name="fullName"
+          placeholder="Full Name"
+          value={profileData.fullName}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Address"
+          value={profileData.address}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="date"
+          name="dateOfBirth"
+          value={profileData.dateOfBirth}
+          onChange={handleChange}
+          required
+        />
         <button type="submit">Save Profile</button>
       </form>
     </div>
   );
 }
-
-export default ProfileSetupPage;

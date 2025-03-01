@@ -1,8 +1,9 @@
-# documents/urls.py
+# medapp_backend/documents/urls.py
 from django.urls import path
-from .views import DocumentCreateView, DocumentListView
-
+from .views import DocumentCreateView, DocumentListView, ServeDocumentView, DocumentDetailView
 urlpatterns = [
-    path('documents/add/', DocumentCreateView.as_view(), name='document_add'),
-    path('documents/', DocumentListView.as_view(), name='document_list'),
+    path('add/', DocumentCreateView.as_view(), name='document_add'),
+    path('', DocumentListView.as_view(), name='document_list'),
+    path('serve/<int:document_id>/', ServeDocumentView.as_view(), name='serve_document'),
+    path('<int:pk>/', DocumentDetailView.as_view(), name='document_detail'),
 ]

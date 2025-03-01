@@ -1,16 +1,65 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
-from .serializers import RegistrationSerializer, OTPVerificationSerializer, ProfileSerializer
-from .models import CustomUser, OTPVerification, Profile
+from rest_framework.decorators import api_view
 from django.conf import settings
-from .serializers import FamilySerializer, ConnectionSerializer
+from django.contrib.auth import get_user_model
+import secrets
 
-# Registration Endpoint
+# Import your serializers and models
+from .serializers import (
+    RegistrationSerializer,
+    OTPVerificationSerializer,
+    ProfileSerializer,
+    FamilySerializer,
+    ConnectionSerializer,
+    PushTokenSerializer
+)
+from .models import CustomUser, OTPVerification, Profile
+
+User = get_user_model()
+
+# Utility function to generate a secure OTP
+def generate_otp(length=6):
+    digits = "0123456789"
+    return ''.join(secrets.choice(digits) for _ in range(length))
+
+# Save Push Token View
+class SavePushTokenView(generics.UpdateAPIView):
+    """
+    Update the current user's push token.
+    """
+    serializer_class = PushTokenSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+# Registration Endpoint with OTP generation and sending
 class RegistrationView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
+
+    def perform_create(self, serializer):
+        # Create the user
+        user = serializer.save()
+        
+        # Generate a secure OTP
+        otp_code = generate_otp()  # e.g., "483920"
+        
+        # Create an OTPVerification record for the user
+        otp_obj = OTPVerification.objects.create(user=user, otp_code=otp_code)
+        
+        # Use the configured OTP service to send the OTP
+        otp_service = settings.OTP_SERVICE_CLASS()  # This should be set in your settings.py
+        try:
+            otp_service.send_otp(user.mobile_number, otp_code)
+        except Exception as e:
+            # If sending fails, delete the OTP record
+            otp_obj.delete()
+            raise Exception("Failed to send OTP. Please try again later.")
+        
+        # For testing: log the generated OTP to the console
+        print("Generated OTP:", otp_code)
 
 # OTP Verification Endpoint
 class OTPVerificationView(generics.GenericAPIView):
@@ -19,6 +68,9 @@ class OTPVerificationView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         otp_code = request.data.get('otp_code')
         username = request.data.get('username')
+        if not username or not otp_code:
+            return Response({"error": "Both username and otp_code are required."},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
             user = CustomUser.objects.get(username=username)
         except CustomUser.DoesNotExist:
@@ -40,32 +92,34 @@ class ProfileSetupView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             profile = serializer.save(user=request.user)
-            return Response({"message": "Profile setup complete.", "profile": ProfileSerializer(profile).data})
+            return Response({
+                "message": "Profile setup complete.",
+                "profile": ProfileSerializer(profile).data
+            })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-OTP_SERVICE_CLASS = settings.OTP_SERVICE_CLASS
+# Accounts Index View (Optional - to list available endpoints)
+@api_view(['GET'])
+def accounts_index(request):
+    endpoints = {
+        "register": "/api/accounts/register/",
+        "otp-verify": "/api/accounts/otp-verify/",
+        "profile-setup": "/api/accounts/profile-setup/",
+        "token": "/api/accounts/token/",
+        "token/refresh": "/api/accounts/token/refresh/",
+        "save_push_token": "/api/accounts/save_push_token/",
+        "chatbot": "/api/accounts/chatbot/",
+        "family/add": "/api/accounts/family/add/",
+        "family": "/api/accounts/family/",
+        "connections/doctor": "/api/accounts/connections/doctor/",
+        "connections/patient": "/api/accounts/connections/patient/",
+    }
+    return Response({
+        "message": "Welcome to the Accounts API.",
+        "endpoints": endpoints
+    })
 
-class RegistrationView(generics.CreateAPIView):
-    serializer_class = RegistrationSerializer
-
-    def perform_create(self, serializer):
-        # Create the user
-        user = serializer.save()
-        otp_code = '123456'  # Replace with secure OTP generation logic
-        otp_obj = OTPVerification.objects.create(user=user, otp_code=otp_code)
-        
-        # Use the configured OTP service
-        otp_service = OTP_SERVICE_CLASS()
-        try:
-            otp_service.send_otp(user.mobile_number, otp_code)
-        except Exception as e:
-            otp_obj.delete()
-            return Response(
-                {"error": "Failed to send OTP. Please try again later."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-
+# Family & Connection Endpoints
 
 # Add Family Member: Send OTP to add a family member
 class AddFamilyMemberView(generics.CreateAPIView):
@@ -73,7 +127,6 @@ class AddFamilyMemberView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # In a real scenario, validate the OTP before adding
         serializer.save(user=self.request.user)
 
 # List Family Members
@@ -82,7 +135,7 @@ class FamilyListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Family.objects.filter(user=self.request.user)
+        return self.request.user.family_owner.all()
 
 # For doctors: List connected patients
 class DoctorConnectionListView(generics.ListAPIView):
@@ -90,8 +143,7 @@ class DoctorConnectionListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Ensure the user is a doctor
-        return Connection.objects.filter(doctor=self.request.user, verified=True)
+        return self.request.user.doctor_connections.filter(verified=True)
 
 # For patients: List connected doctors
 class PatientConnectionListView(generics.ListAPIView):
@@ -99,5 +151,4 @@ class PatientConnectionListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Ensure the user is a patient
-        return Connection.objects.filter(patient=self.request.user, verified=True)
+        return self.request.user.patient_connections.filter(verified=True)
