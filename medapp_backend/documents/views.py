@@ -11,7 +11,6 @@ class DocumentCreateView(generics.CreateAPIView):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    # Allow file uploads
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
@@ -25,6 +24,11 @@ class DocumentListView(generics.ListAPIView):
     def get_queryset(self):
         return Document.objects.filter(user=self.request.user).order_by('-document_date')
 
+class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
 # medapp_backend/documents/views.py
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse, Http404

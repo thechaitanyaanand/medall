@@ -1,62 +1,34 @@
-// src/pages/ProfileSetupPage.js
-import React, { useState } from 'react';
+// src/pages/ProfilePage.js
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../apiClient';
-import './ProfileSetupPage.css';
+import './ProfilePage.css';
 
-export default function ProfileSetupPage() {
-  const [profileData, setProfileData] = useState({
-    fullName: '',
-    address: '',
-    dateOfBirth: '',
-  });
+export default function ProfilePage({ user }) {
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setProfileData({ ...profileData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await apiClient.post('/accounts/profile-setup/', profileData);
-      console.log('Profile setup complete:', response.data);
-      navigate('/home');
-    } catch (error) {
-      console.error('Profile setup error:', error.response?.data || error.message);
-      alert('Profile setup failed.');
-    }
+  // For demonstration, if a user object is not passed in as a prop,
+  // we can use a dummy user.
+  const currentUser = user || {
+    fullName: 'John Doe',
+    address: '123 Main St, Anytown, USA',
+    dateOfBirth: '1990-01-01'
   };
 
   return (
-    <div className="container">
-      <h2>Profile Setup</h2>
-      <form onSubmit={handleSubmit} className="profile-form">
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Full Name"
-          value={profileData.fullName}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={profileData.address}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="date"
-          name="dateOfBirth"
-          value={profileData.dateOfBirth}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Save Profile</button>
-      </form>
+    <div className="profile-container">
+      <div className="profile-header">
+        <h2>{currentUser.fullName}</h2>
+        <p><strong>Address:</strong> {currentUser.address}</p>
+        <p><strong>Date of Birth:</strong> {currentUser.dateOfBirth}</p>
+      </div>
+      <div className="profile-buttons">
+        <button className="primary-button" onClick={() => navigate('/documents/add')}>
+          Add Documents
+        </button>
+        <button className="primary-button" onClick={() => navigate('/documents')}>
+          View Documents
+        </button>
+      </div>
     </div>
   );
 }

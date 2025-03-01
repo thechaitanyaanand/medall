@@ -8,6 +8,7 @@ import {
   FaUsers, // Family icon
   FaComments, // Connections icon
   FaRobot, // Chat Bot icon
+  FaFileUpload, // Add Documents icon
 } from "react-icons/fa";
 
 import Sidebar from "../components/Sidebar"; // Keep Sidebar if needed
@@ -50,7 +51,7 @@ function HomePage() {
 
       {/* Main content area */}
       <div style={styles.mainContent}>
-        {/* 2×3 Grid of icons with labels */}
+        {/* 2×? Grid of icons with labels */}
         <div style={styles.gridContainer}>
           {/* Reminders */}
           <div
@@ -102,6 +103,15 @@ function HomePage() {
             <FaRobot size={60} color="#007BFF" />
             <p style={styles.iconLabel}>Chat Bot</p>
           </div>
+
+          {/* Add Documents */}
+          <div
+            className="icon-box"
+            onClick={() => handleNavigation("/documents")}
+          >
+            <FaFileUpload size={60} color="#007BFF" />
+            <p style={styles.iconLabel}>Documents</p>
+          </div>
         </div>
       </div>
     </div>
@@ -150,7 +160,6 @@ const styles = {
   gridContainer: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gridTemplateRows: "repeat(2, 1fr)",
     gap: "30px",
     maxWidth: "800px",
     margin: "40px auto",

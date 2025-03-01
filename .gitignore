@@ -67,7 +67,7 @@ docs/_build/
 .ipynb_checkpoints/
 
 # Environment Variables
-.env
+#.env
 .env.*
 
 # Node/React Frontend

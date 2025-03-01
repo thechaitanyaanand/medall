@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../apiClient';
-import './OTPVerificationPage.css';
 
 export default function OTPVerificationPage() {
   const [otp, setOtp] = useState('');
