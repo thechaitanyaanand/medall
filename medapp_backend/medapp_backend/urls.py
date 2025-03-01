@@ -16,9 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Include accounts endpoints with the "api/accounts/" prefix
     path('api/accounts/', include('accounts.urls')),
-    path('api/', include('reminders.urls')),
+    # Include reminders endpoints with the "api/reminders/" prefix
+    path('api/reminders/', include('reminders.urls')),
+    # Include documents endpoints with the "api/documents/" prefix
+    path('api/documents/', include('documents.urls')),
+    path('', RedirectView.as_view(url='api/accounts/', permanent=False)),
 ]
+
+# If you're in development and want to serve media files:
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

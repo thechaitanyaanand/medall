@@ -14,6 +14,7 @@ import DocumentManagementPage from './pages/DocumentManagementPage';
 import ChatbotScreen from './pages/ChatbotScreen';
 import FamilyPage from './pages/FamilyPage';
 import ConnectionsPage from './pages/ConnectionsPage';
+import ProfilePage from './pages/ProfilePage';
 
 import './App.css';
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/profile-setup" element={<ProfileSetupPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/reminders" element={<RemindersPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/documents" element={<DocumentManagementPage />} />

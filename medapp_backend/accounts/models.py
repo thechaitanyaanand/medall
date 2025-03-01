@@ -1,23 +1,24 @@
 # accounts/models.py
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
 
-# Custom User Manager and Model (if not already defined)
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, mobile_number, password, role, **extra_fields):
+    def create_user(self, username, mobile_number, password=None, **extra_fields):
         if not username:
-            raise ValueError("Username is required")
-        if not mobile_number:
-            raise ValueError("Mobile number is required")
-        user = self.model(username=username, mobile_number=mobile_number, role=role, **extra_fields)
+            raise ValueError("The Username must be set")
+        user = self.model(username=username, mobile_number=mobile_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, mobile_number, password, role='doctor', **extra_fields):
+    def create_superuser(self, username, mobile_number, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(username, mobile_number, password, role, **extra_fields)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+        return self.create_user(username, mobile_number, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
@@ -26,14 +27,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     objects = CustomUserManager()
-    
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['mobile_number', 'role']
 
     def __str__(self):
         return self.username
+
 
 # OTP Verification model
 class OTPVerification(models.Model):

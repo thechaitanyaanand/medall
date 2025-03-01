@@ -3,7 +3,6 @@ from celery import shared_task
 from datetime import datetime
 from django.utils import timezone
 from .models import Reminder
-from .utils import send_medicine_notification  # We'll create this next
 # reminders/tasks.py (update import)
 from .utils.notification import send_medicine_notification
 

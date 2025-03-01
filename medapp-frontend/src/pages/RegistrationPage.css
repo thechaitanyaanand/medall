@@ -1,65 +1,71 @@
+/* src/pages/RegistrationPage.css */
 .container {
-    background-color: #f0f4f8;
-    max-width: 400px;
-    margin: 40px auto;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  h2 {
-    text-align: center;
-    color: #007bff;
-    margin-bottom: 20px;
-  }
-  
-  .registration-form label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  
-  .registration-form input,
-  .registration-form select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .primary-button {
-    width: 100%;
-    background-color: #007bff;
-    color: #ffffff;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    margin-top: 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .primary-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .login-link {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
-  }
-  
-  .link-button {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
-  }
-  
-  .link-button:hover {
-    color: #0056b3;
-  }
-  
+  background-color: #f0f4f8;
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
+.registration-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.registration-form input,
+.registration-form select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.primary-button {
+  width: 100%;
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  margin-top: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.primary-button:hover {
+  background-color: #0056b3;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.link-button {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.link-button:hover {
+  color: #0056b3;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin: 5px 0;
+}

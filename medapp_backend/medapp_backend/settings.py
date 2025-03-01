@@ -9,12 +9,45 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import os
+import environ
+from pathlib import Path
+
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+# Read .env file if it exists
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# Set DEBUG from environment
+DEBUG = env('DEBUG')
+
+if DEBUG:
+    # Development: Use local file storage
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+else:
+    # Production: Use AWS S3
+    AWS_DEFAULT_ACL = 'private'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -37,11 +70,13 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'corsheaders',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts',
     'reminders',
+    'documents',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +87,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'medapp_backend.urls'
@@ -146,7 +183,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py (or a dedicated config file)
-import os
 
 OTP_SERVICE = os.getenv("OTP_SERVICE", "dummy")  # default to dummy
 
@@ -167,16 +203,18 @@ else:
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
 
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'check-reminders-every-5-minutes': {
-        'task': 'reminders.tasks.check_and_send_reminder_notifications',
-        'schedule': crontab(minute='*/5'),  # runs every 5 minutes
+    'check-notifications-every-minute': {
+        'task': 'reminders.tasks.check_and_send_notifications',
+        'schedule': crontab(),  # Runs every minute
     },
 }
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]

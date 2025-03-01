@@ -5,7 +5,7 @@ import OTPScreen from '../screens/OTPScreen';
 import ProfileSetupScreen from '../screens/ProfileSetupScreen';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-
+import profile
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
