@@ -1,4 +1,3 @@
-// src/pages/HomePage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -131,12 +130,13 @@ const styles = {
     color: "#fff",
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between", // Pushes menu button to right
     padding: "0 20px",
   },
   appName: {
     fontSize: "20px",
     fontWeight: "bold",
+    flexGrow: 1, // Pushes text to left
   },
   menuButton: {
     background: "none",
@@ -144,6 +144,9 @@ const styles = {
     fontSize: "24px",
     color: "#fff",
     cursor: "pointer",
+    padding: "5px 10px", // Prevents button stretching
+    width: "auto", // Ensures no extra width
+    display: "inline-block", // Restricts size
   },
   overlay: {
     position: "fixed",

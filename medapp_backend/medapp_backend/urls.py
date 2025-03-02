@@ -29,6 +29,7 @@ urlpatterns = [
     # Include documents endpoints with the "api/documents/" prefix
     path('api/documents/', include('documents.urls')),
     path('', RedirectView.as_view(url='api/accounts/', permanent=False)),
+    path('api/chatbot/', include('chatbot.urls')), 
 ]
 
 # If you're in development and want to serve media files:
