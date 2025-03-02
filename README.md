@@ -3,7 +3,7 @@ International Healthcare Hackathon 2025
 
 # MedApp Project
 
-MedApp is a comprehensive medical application that provides features such as user registration with OTP verification, medicine reminders, appointments scheduling, document management, a chatbot for medical inquiries, and family/doctor-patient connections. The project comprises a Django backend with RESTful APIs, Celery for scheduling and push notifications via mobile OS, and modern frontends (React for web and React Native/Expo for mobile).
+MedApp is a comprehensive medical application that provides features such as user registration with OTP verification, medicine reminders, appointment scheduling, document management, an AI-powered chatbot for medical inquiries, and family/doctor-patient connections. The project comprises a Django backend with RESTful APIs (using JWT for authentication, Celery for background tasks, and Redis as a message broker), a modern React web frontend, and a React Native/Expo mobile app.
 
 ## Table of Contents
 
@@ -27,31 +27,48 @@ MedApp is a comprehensive medical application that provides features such as use
 
 ## Overview
 
-MedApp aims to provide a seamless and secure healthcare management experience. Key features include:
-- **User Registration & OTP Verification:** Users register with a unique username, mobile number, and password, verify their account via OTP.
-- **Medicine Reminders:** Users can add medicine reminders with specified timings, take doses, refill when needed, and delete reminders.
-- **Appointments:** Schedule and view upcoming appointments.
-- **Profile & Document Management:** Upload and view medical documents.
-- **Chatbot Integration:** A chatbot that leverages AI to answer medical queries.
-- **Family & Connections:** Manage family members and doctor-patient connections.
+MedApp aims to provide a seamless, secure, and user-friendly healthcare management experience. Key features include:
+
+- **User Registration & OTP Verification:**  
+  Users register with a unique username, mobile number, and password. They verify their account via an OTP sent to their phone.
+  
+- **Medicine Reminders:**  
+  Users can add medicine reminders with specified timings, mark doses as taken, refill tablets when needed, and delete reminders. Data is stored persistently in the backend.
+  
+- **Appointments:**  
+  Users can schedule and view upcoming appointments.
+  
+- **Profile & Document Management:**  
+  Users can set up and update their profile, upload/view medical documents, and manage their medical records.
+  
+- **Chatbot Integration:**  
+  An AI-powered chatbot (integrated with a locally running LLM via Ollama) answers medical inquiries.
+  
+- **Family & Connections:**  
+  Manage family members and doctor-patient connections, enabling secure sharing of medical documents and information.
 
 ## Technologies Used
 
-- **Backend:** Django, Django REST Framework, JWT (SimpleJWT), Celery, Redis, PostgreSQL
-- **Frontend (Web):** React, React Router
-- **Mobile:** React Native with Expo, expo-notifications
-- **Others:** boto3, requests
+- **Backend:**  
+  Django, Django REST Framework, SimpleJWT, Celery, Redis, PostgreSQL, Requests
+- **Frontend (Web):**  
+  React, React Router
+- **Mobile:**  
+  React Native with Expo, expo-notifications
+- **Others:**  
+  boto3, axios
 
 ## Project Structure
 
-A typical project structure looks like:
+A typical project structure is as follows:
 
 ```
 medapp/
 ├── medapp_backend/          # Django backend
-│   ├── accounts/            # Custom user model, OTP, profile, etc.
-│   ├── reminders/           # Reminders, appointments, and related tasks
+│   ├── accounts/            # Custom user model, OTP verification, profile, family & connection endpoints
+│   ├── reminders/           # Medicine reminders & appointments endpoints
 │   ├── documents/           # Document management endpoints
+│   ├── chatbot/             # Chatbot endpoints (LLM integration via Ollama)
 │   ├── medapp_backend/      # Django settings, urls, wsgi/asgi, celery.py, etc.
 │   ├── manage.py
 │   └── requirements.txt
@@ -72,7 +89,7 @@ medapp/
 │   │   ├── App.js
 │   │   └── index.js
 │   └── package.json
-└── medapp-mobile/           # Expo mobile app
+└── medapp-mobile/           # Expo mobile app #currently incomplete
     ├── App.js
     ├── navigation/
     │   └── AppNavigator.js
@@ -121,7 +138,7 @@ medapp/
    pip install -r requirements.txt
    ```
 
-### Environment Variables
+### Environment Variables(commented out in development right noow no need to configure)
 
 Create a `.env` file (or configure your environment) with necessary variables. For example:
 
@@ -198,7 +215,6 @@ python manage.py migrate
    ```bash
    npx expo start
    ```
-
    Use the Expo Go app on your mobile device to scan the QR code.
 
 ## Running the Application
@@ -208,17 +224,17 @@ python manage.py migrate
   ```bash
   python manage.py runserver
   ```
-  Make sure Redis, Celery worker, and Celery beat are running for scheduled tasks (like sending push notifications).
+  Ensure Redis, Celery worker, and Celery beat are running for scheduled tasks(code currently commented out for development).
 
 - **Web Frontend:**  
   The React app runs on [http://localhost:3000](http://localhost:3000).
 
 - **Mobile App:**  
-  Use Expo Go to test on your mobile device.
+  Use Expo Go to test on your mobile device.(incomplete)
 
 ## Deployment Notes
 
-- Configure production settings for Django (e.g., DEBUG=False, secure SECRET_KEY, proper ALLOWED_HOSTS).
+- Configure production settings for Django (e.g., `DEBUG=False`, secure `SECRET_KEY`, proper `ALLOWED_HOSTS`).
 - Set up a production message broker (Redis) and configure Celery appropriately.
 - Use a CI/CD pipeline for automated testing and deployment.
 - For mobile, build and publish via Expo to the Apple App Store and Google Play Store.
@@ -242,7 +258,12 @@ python manage.py migrate
   Verify that Redis is running and check logs for errors.
 - **Push Notifications:**  
   Ensure your mobile device is a physical device (push notifications do not work on simulators/emulators for iOS) and check Expo documentation.
+- **Chatbot Issues:**  
+  - Ensure your locally running LLM (Ollama) is accessible on the correct port.
+  - Verify that the payloads match the API requirements.
+  - Use browser developer tools (Network tab) to debug API requests.
+- **Profile/Document/Reminder Endpoints:**  
+  Ensure that your frontend is sending the correct field names and that your backend models and serializers match those names.
 
----
 
-This README provides detailed instructions and guidance, covering installation, setup, running the project, deployment, and collaboration tips.
+This README provides an in-depth guide covering installation, environment setup, project structure, running the application, deployment notes, collaboration guidelines, and troubleshooting. Let me know if you need further modifications or additional sections!
