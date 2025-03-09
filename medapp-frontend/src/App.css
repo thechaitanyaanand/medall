@@ -1,3 +1,4 @@
+/* General App Styling */
 .App {
   text-align: center;
 }
@@ -28,6 +29,7 @@
   color: #61dafb;
 }
 
+/* Keyframes for Logo Animation */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -37,7 +39,7 @@
   }
 }
 
-/* App.css */
+/* Body Styling */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -45,39 +47,58 @@ body {
   color: #333;
 }
 
-/* Container for pages */
+/* Container for Pages */
 .container {
+  width: 90%;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* Smooth hover effect for buttons */
+/* Smooth Hover Effect for Buttons */
 button {
-  background-color: #007bff;
+  background-color: #0056b3; /* Improved Contrast */
   border: none;
   color: #ffffff;
   padding: 10px 20px;
   margin: 10px 0;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #003d80; /* Darker Blue for Better Visibility */
+  transform: scale(1.05); /* Slight Scale Effect */
 }
 
-/* Input styling */
+/* Input and Select Styling */
 input, select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin: 6px 0 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Responsive Design Tweaks */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+
+  button {
+    width: 100%;
+  }
 }

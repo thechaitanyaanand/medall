@@ -1,0 +1,112 @@
+**Medical Health Report**  
+**Patient Name:** John Smith  
+**Medical Record Number:** 123456  
+**Date of Birth:** January 15, 1965  
+**Gender:** Male  
+**Date of Report:** October 25, 2023  
+
+---
+
+### **Chief Complaint**  
+Chest pain radiating to the left arm, associated with diaphoresis and dyspnea, leading to a diagnosis of ST-segment elevation myocardial infarction (STEMI).  
+
+---
+
+### **History of Present Illness**  
+Mr. Smith, a 58-year-old male with a history of hypertension, type 2 diabetes, and hyperlipidemia, presented to the emergency department on October 20, 2023, reporting sudden-onset substernal chest pain rated 9/10 in intensity. The pain began while he was watching television and radiated to his left arm and jaw, accompanied by nausea, diaphoresis, and shortness of breath. Symptoms persisted for 90 minutes prior to arrival.  
+
+ECG revealed ST-segment elevation in anterior leads (V2–V4), confirming an anterior STEMI. Emergent cardiac catheterization showed 95% occlusion of the proximal left anterior descending (LAD) artery, successfully treated with a drug-eluting stent. Troponin-I peaked at 25 ng/mL (normal <0.04 ng/mL). Post-procedure, he was stabilized in the cardiac care unit (CCU) and transitioned to telemetry.  
+
+---
+
+### **Past Medical History**  
+1. **Hypertension:** Diagnosed in 2010, poorly controlled (last BP 150/92 mmHg prior to admission).  
+2. **Type 2 Diabetes Mellitus:** Diagnosed in 2015, HbA1c 8.2% (August 2023). Managed with metformin 1000 mg BID.  
+3. **Hyperlipidemia:** Diagnosed in 2018, LDL 140 mg/dL (June 2023). On atorvastatin 40 mg nightly.  
+4. **Obesity:** BMI 32 kg/m² (weight 220 lbs, height 5'10").  
+
+**Previous Surgeries/Procedures:** None.  
+
+---
+
+### **Family History**  
+- Father: Deceased at age 65 from acute MI.  
+- Mother: Deceased at age 68 from complications of diabetes.  
+- Sister: Hypertension.  
+
+---
+
+### **Social History**  
+- **Tobacco Use:** 30 pack-year history; quit in 2020.  
+- **Alcohol:** Occasional (1–2 beers/week).  
+- **Diet:** High in processed foods and saturated fats.  
+- **Physical Activity:** Sedentary lifestyle (no regular exercise).  
+- **Occupation:** Long-haul truck driver (high-stress job).  
+
+---
+
+### **Medications on Admission**  
+1. Metformin 1000 mg BID  
+2. Lisinopril 10 mg daily  
+3. Atorvastatin 40 mg nightly  
+4. Aspirin 81 mg daily (self-initiated 6 months ago)  
+
+**Allergies:** No known drug allergies.  
+
+---
+
+### **Physical Examination (Post-Stent Placement)**  
+- **Vitals:** BP 128/78 mmHg, HR 72 bpm, RR 14/min, SpO2 98% on room air.  
+- **Cardiovascular:** Regular rate/rhythm. S1/S2 normal. No murmurs/rubs/gallops.  
+- **Lungs:** Clear to auscultation bilaterally.  
+- **Abdomen:** Soft, non-tender. No organomegaly.  
+- **Extremities:** Trace pedal edema.  
+
+---
+
+### **Diagnostic Results**  
+1. **ECG:** Anterior STEMI (initial); post-stent ECG showed resolution of ST elevation.  
+2. **Echocardiogram:** LVEF 45% with anterior wall hypokinesis.  
+3. **Labs:** LDL 100 mg/dL (post-statin), HbA1c 7.8% (improved with inpatient insulin).  
+
+---
+
+### **Assessment**  
+1. **Acute Anterior STEMI (AHA Class I)** secondary to LAD occlusion.  
+2. **Hypertensive Heart Disease** with compensated systolic dysfunction (LVEF 45%).  
+3. **Type 2 Diabetes Mellitus** with suboptimal control.  
+4. **Hyperlipidemia** with improved LDL on statin therapy.  
+5. **Obesity** and sedentary lifestyle contributing to cardiovascular risk.  
+
+---
+
+### **Treatment Plan**  
+1. **Medications:**  
+   - Dual antiplatelet therapy: Aspirin 81 mg daily + Clopidogrel 75 mg daily (12-month regimen).  
+   - Beta-blocker: Metoprolol XL 25 mg daily.  
+   - ACE inhibitor: Lisinopril increased to 20 mg daily (for LVEF <50%).  
+   - High-intensity statin: Atorvastatin 80 mg nightly.  
+   - SGLT2 inhibitor: Empagliflozin 10 mg daily (added for diabetes and cardiorenal benefit).  
+
+2. **Lifestyle Modifications:**  
+   - Cardiac rehabilitation program (3x/week).  
+   - Dietary consult for low-sodium, heart-healthy diet.  
+   - Smoking cessation reinforcement.  
+
+3. **Follow-Up:**  
+   - Cardiology visit in 7 days for wound check and medication titration.  
+   - Repeat echocardiogram in 3 months.  
+   - Primary care visit for diabetes management in 14 days.  
+
+---
+
+**Prognosis:** Guarded due to multiple cardiovascular risk factors, but favorable with adherence to medical therapy and lifestyle changes.  
+
+---  
+**Prepared by:**  
+Dr. Emily Carter, MD  
+Cardiology  
+[Hospital Name/Contact]  
+
+---  
+*This report is intended for use by healthcare professionals involved in the patient’s care.*
