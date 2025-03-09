@@ -1,18 +1,89 @@
-/* HomePage.css */
+/* Reset and Base Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #F0F4F8;
+  color: #333;
+}
+
+/* Responsive Grid Adjustments */
+@media screen and (max-width: 1024px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Accessibility Improvements */
+.icon-box {
+  outline: none;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.icon-box:focus {
+  outline: 2px solid #4A90E2;
+  outline-offset: 2px;
+}
+
+/* Hover and Active States */
 .icon-box {
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 20px;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
 }
 
 .icon-box:hover {
-  background-color: #e6f7ff; /* Pale light blue */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
-body {
-  background-color: red;
+
+.icon-box:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Icon and Label Styling */
+.icon-box .icon {
+  margin-bottom: 10px;
+}
+
+.icon-box .label {
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Scrollbar Styling (Optional) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4A90E2;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2C7BD6;
 }

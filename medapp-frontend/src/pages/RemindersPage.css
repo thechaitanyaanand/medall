@@ -1,98 +1,165 @@
+/* src/pages/RemindersPage.css */
 .container {
-  background-color: #f0f4f8;
-  padding: 20px;
+  background-color: #f7f9fc;
+  padding: 30px;
   min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
 h2 {
-  color: #007bff;
+  color: #3a7bd5;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 10px;
 }
 
+h2:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+}
+
+/* Form styling */
 .new-reminder-form {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 500px;
-  margin: 0 auto 30px;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 15px;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .new-reminder-form input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  flex: 1;
+  min-width: 180px;
+  padding: 12px 15px;
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.new-reminder-form input:focus {
+  border-color: #3a7bd5;
+  box-shadow: 0 0 0 2px rgba(58, 123, 213, 0.2);
+  outline: none;
 }
 
 .new-reminder-form button {
-  padding: 12px;
-  background-color: #007bff;
-  color: #fff;
+  flex: 1;
+  min-width: 180px;
+  padding: 12px 15px;
+  background: linear-gradient(to right, #3a7bd5, #00d2ff);
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .new-reminder-form button:hover {
-  background-color: #0056b3;
+  box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+  transform: translateY(-2px);
 }
 
+/* Reminder list styling */
 .reminder-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
 }
 
 .reminder-card {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-top: 5px solid #3a7bd5;
 }
 
 .reminder-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.reminder-card h3 {
+  color: #3a7bd5;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.reminder-card p {
+  color: #555;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+}
+
+.reminder-card p:before {
+  content: '•';
+  margin-right: 8px;
+  color: #3a7bd5;
+  font-size: 20px;
 }
 
 .reminder-actions {
-  margin-top: 10px;
   display: flex;
   gap: 10px;
+  margin-top: 20px;
 }
 
 .reminder-actions button {
-  padding: 8px 12px;
+  flex: 1;
+  padding: 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .reminder-actions button:nth-child(1) {
-  background-color: #28a745; /* Green for taking dose */
-  color: #fff;
+  background-color: #4caf50;
+  color: white;
 }
 
 .reminder-actions button:nth-child(2) {
-  background-color: #ffc107; /* Yellow for refill */
-  color: #fff;
+  background-color: #ff9800;
+  color: white;
 }
 
 .reminder-actions button:nth-child(3) {
-  background-color: #dc3545; /* Red for delete */
-  color: #fff;
+  background-color: #f44336;
+  color: white;
+}
+
+.reminder-actions button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
 }
 
 .error {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 15px auto;
+  max-width: 800px;
   text-align: center;
 }

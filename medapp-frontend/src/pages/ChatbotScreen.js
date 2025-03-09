@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import Tesseract from "tesseract.js";
+import { pdfjs } from "react-pdf";
 import "./ChatbotScreen.css";
+
+// Initialize PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 /**
  * Utility function that removes any content between <think> and </think> (including the tags).
@@ -15,6 +19,7 @@ export default function ChatbotScreen() {
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState([]);
+  const [processingFile, setProcessingFile] = useState(false);
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -51,44 +56,110 @@ export default function ChatbotScreen() {
   };
 
   /**
+   * Extracts text from a PDF file using pdf.js
+   */
+  const extractTextFromPDF = async (file) => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      let fullText = "";
+
+      // Get all pages
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + "\n\n";
+      }
+
+      return fullText;
+    } catch (error) {
+      console.error("Error extracting text from PDF:", error);
+      return "";
+    }
+  };
+
+  /**
+   * Extracts text from a text file
+   */
+  const extractTextFromTXT = async (file) => {
+    try {
+      const text = await file.text();
+      return text;
+    } catch (error) {
+      console.error("Error extracting text from TXT:", error);
+      return "";
+    }
+  };
+
+  /**
    * handleFileChange
    * - Creates a doc object for each uploaded file.
-   * - If it’s an image, runs Tesseract OCR to extract text and stores it in doc.ocrText.
-   * - Adds all docs to our documents state.
+   * - Processes different file types appropriately:
+   *   - Images: runs Tesseract OCR
+   *   - PDFs: extracts text using pdf.js
+   *   - Text files: reads the text content directly
    */
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setProcessingFile(true);
     const newDocs = [];
 
     for (const file of files) {
-      const isImage = file.type.startsWith("image/");
-      // Create a doc object
+      // Create a doc object with basic properties
       const doc = {
         name: file.name,
         type: file.type,
-        // URL for preview (if it's an image)
-        url: isImage ? URL.createObjectURL(file) : null,
-        // We'll store OCR text here (empty until Tesseract completes)
-        ocrText: "",
+        url: file.type.startsWith("image/") ? URL.createObjectURL(file) : null,
+        extractedText: "",
       };
 
-      if (isImage) {
-        try {
-          // Run Tesseract.js on the local image URL
+      try {
+        // Process different file types
+        if (file.type.startsWith("image/")) {
+          // For images, use Tesseract OCR
           const result = await Tesseract.recognize(doc.url, "eng");
-          doc.ocrText = result.data.text;
-        } catch (error) {
-          console.error("OCR error:", error);
-          doc.ocrText = "";
+          doc.extractedText = result.data.text;
+        } else if (file.type === "application/pdf") {
+          // For PDFs, use pdf.js
+          doc.extractedText = await extractTextFromPDF(file);
+        } else if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+          // For text files
+          doc.extractedText = await extractTextFromTXT(file);
+        } else {
+          // For unsupported file types
+          doc.extractedText = `[File type ${file.type} not supported for text extraction]`;
         }
+      } catch (error) {
+        console.error(`Error processing ${file.name}:`, error);
+        doc.extractedText = `[Error extracting text: ${error.message}]`;
       }
 
       newDocs.push(doc);
     }
 
     setDocuments((prevDocs) => [...prevDocs, ...newDocs]);
+    setProcessingFile(false);
+    
     // Clear the input value so the same file can be re-uploaded if needed
     e.target.value = null;
+  };
+
+  /**
+   * Removes a document from the documents list
+   */
+  const handleRemoveDocument = (index) => {
+    setDocuments((prevDocs) => {
+      const newDocs = [...prevDocs];
+      // If the document has a URL (for images), revoke it to free memory
+      if (newDocs[index].url) {
+        URL.revokeObjectURL(newDocs[index].url);
+      }
+      newDocs.splice(index, 1);
+      return newDocs;
+    });
   };
 
   /**
@@ -106,11 +177,11 @@ export default function ChatbotScreen() {
     let docsSummary = "";
     if (documents.length > 0) {
       docsSummary = "Patient documents available:\n";
-      documents.forEach((doc) => {
-        docsSummary += `- ${doc.name} (${doc.type})\n`;
-        // If there's OCR text, include it
-        if (doc.ocrText) {
-          docsSummary += `  Extracted text:\n${doc.ocrText}\n\n`;
+      documents.forEach((doc, index) => {
+        docsSummary += `- Document ${index + 1}: ${doc.name} (${doc.type})\n`;
+        // If there's extracted text, include it
+        if (doc.extractedText) {
+          docsSummary += `  Extracted text:\n${doc.extractedText}\n\n`;
         }
       });
     }
@@ -121,8 +192,8 @@ export default function ChatbotScreen() {
       content:
         "You are a professional medical assistant. Provide only strictly professional medical advice. " +
         "If needed, recommend scheduling a doctor's appointment. " +
-        "Use any provided images and documents solely to understand the patient's medical history, " +
-        "and ignore any irrelevant content. " +
+        "Use the provided documents to understand the patient's medical history and answer their questions. " +
+        "Directly reference relevant information from documents when answering. " +
         "If a user asks a non-medical question, politely clarify that your role is to offer medical assistance." +
         (docsSummary ? `\n\n${docsSummary}` : ""),
     };
@@ -211,8 +282,12 @@ export default function ChatbotScreen() {
       <div className="sidebar">
         <div className="sidebar-header">
           <span>Patient Documents</span>
-          <button className="add-document-button" onClick={handleAddDocumentClick}>
-            Add
+          <button 
+            className="add-document-button" 
+            onClick={handleAddDocumentClick}
+            disabled={processingFile}
+          >
+            {processingFile ? "Processing..." : "Add"}
           </button>
         </div>
 
@@ -232,12 +307,36 @@ export default function ChatbotScreen() {
                 {doc.url ? (
                   <img src={doc.url} alt={doc.name} className="document-thumbnail" />
                 ) : (
-                  <div className="document-filename">{doc.name}</div>
+                  <div className="document-icon">
+                    {doc.type === "application/pdf" ? "📄" : "📝"}
+                  </div>
                 )}
+                <div className="document-info">
+                  <div className="document-filename">{doc.name}</div>
+                  <div className="document-text-preview">
+                    {doc.extractedText 
+                      ? doc.extractedText.substring(0, 30) + "..." 
+                      : "No text extracted"}
+                  </div>
+                </div>
+                <button 
+                  className="remove-document-button"
+                  onClick={() => handleRemoveDocument(index)}
+                >
+                  ✕
+                </button>
               </div>
             ))
           ) : (
-            <div className="no-documents">No documents uploaded.</div>
+            <div className="no-documents">
+              No documents uploaded.
+              <button 
+                className="upload-hint-button"
+                onClick={handleAddDocumentClick}
+              >
+                Upload documents to provide context
+              </button>
+            </div>
           )}
         </div>
       </div>
